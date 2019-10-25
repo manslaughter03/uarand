@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	uarand "git.hydra-project.io/banks/user-agent-random"
+	uarand "git.hydra-project.io/banks/uarand"
 )
 
 func main() {
