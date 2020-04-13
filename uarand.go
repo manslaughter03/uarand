@@ -1,31 +1,41 @@
 package uarand
 
 import (
+  "io"
 	"bufio"
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
+  "net/http"
 )
 
 const (
-	userAgentList = "./user-agents.txt"
+  userAgentList = "https://gist.githubusercontent.com/pzb/b4b6f57144aea7827ae4/raw/cf847b76a142955b1410c8bcef3aabe221a63db1/user-agents.txt"
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+func fetchUserAgentList() (io.ReadCloser, error) {
+  res, err := http.Get(userAgentList)
+  if err != nil {
+    return nil, err
+  }
+
+  return res.Body, nil
+}
+
 func GetRandomUserAgent() (string, error) {
 	var lines []string
-	file, err := os.Open(userAgentList)
+	data, err := fetchUserAgentList()
 	if err != nil {
-		return "", fmt.Errorf("can't readfile %s, got %v", userAgentList, err)
+		return "", fmt.Errorf("can't fetch user agent lists, got %v", err)
 	}
 
-	defer file.Close()
+	defer data.Close()
 
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(data)
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
